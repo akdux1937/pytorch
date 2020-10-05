@@ -165,11 +165,11 @@
   self: grad * -((-self * self + 1).rsqrt())
 
 - name: add.Tensor(Tensor self, Tensor other, *, Scalar alpha=1) -> Tensor
-  self: grad
-  other: maybe_multiply(grad, alpha)
+  self: handle_r_to_c(self.scalar_type(), grad)
+  other: handle_r_to_c(self.scalar_type(), maybe_multiply(grad, alpha))
 
 - name: add.Scalar(Tensor self, Scalar other, Scalar alpha=1) -> Tensor
-  self: grad
+  self: handle_r_to_c(self.scalar_type(), grad)
 
 - name: addbmm(Tensor self, Tensor batch1, Tensor batch2, *, Scalar beta=1, Scalar alpha=1) -> Tensor
   self: maybe_multiply(grad, beta)
@@ -213,7 +213,7 @@
   self: grad
 
 - name: angle(Tensor self) -> Tensor
-  self: grad.to(self.scalar_type()) * (self*Scalar(c10::complex<double>{0.0, 1.0})).conj() / self.abs().pow(2)
+  self: 'not_implemented("angle")'
 
 # The four items below are necessary because TensorIterator doesn't work on
 # Variables (codegen does not unwrap the input Tensor for all() and any() ).
